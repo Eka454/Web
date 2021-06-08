@@ -1,0 +1,43 @@
+
+.budget-feedback,
+.expense-feedback {
+  display: none;
+}
+
+.expense-submit:hover {
+  background: #d60909;
+  color: white;
+}
+.budget-submit:hover {
+  background: green;
+  color: white;
+}
+
+.edit {
+  color:  green;
+  font-size: 15px;
+}
+.delete {
+  color: #d60909;
+  font-size: 15px;
+}
+
+.budget {
+  color: green;
+}
+.expense {
+  color: #d60909;
+}
+.mb-0{
+  color: black;
+   font-size: 16px;
+}
+
+.list-item {
+  flex: 0 0 33.33%;
+  text-align: center;
+}
+.showItem {
+  display: block;
+}
+
