@@ -2,6 +2,7 @@ class UI {
   constructor() {
     this.budgetFeedback = document.querySelector(".budget-feedback");
     this.expenseFeedback = document.querySelector(".expense-feedback");
+    this.balanceFeedback = document.querySelector(".balance-feedback");
     this.budgetInput = document.getElementById("budget-input");
     this.budgetAmount = document.getElementById("budget-amount");
     this.expenseAmount = document.getElementById("expense-amount");
@@ -24,9 +25,20 @@ class UI {
           self.budgetFeedback.classList.remove('showItem');
         }, 3000);
       } else {
-        this.budgetAmount.textContent = value;
-        this.budgetInput.value = '';
-        this.showBalance();
+        const exp = this.totalExpense();
+        const total = value - exp;
+        if(total < 0){
+          this.balanceFeedback.classList.add('showItem');
+          this.balanceFeedback.innerHTML = `<p>Вы превысили бюджет на ${-total}&#8381;</p>`;
+          const self = this;
+          setTimeout(function(){
+            self.balanceFeedback.classList.remove('showItem');
+          }, 3000);
+        } else {
+          this.budgetAmount.textContent = value;
+          this.budgetInput.value = '';
+          this.showBalance();
+        }
       }
   }
 
@@ -57,11 +69,21 @@ class UI {
         title: expenseValue,
         amount: amount
       }
-      this.itemID++;
-      this.itemList.push(expense);
-      this.addExpense(expense);
-      this.showBalance();
-
+      const exp = this.totalExpense() + amount;
+      const total = parseInt(this.budgetAmount.textContent) - exp;
+      if(total < 0){
+        this.balanceFeedback.classList.add('showItem');
+        this.balanceFeedback.innerHTML = `<p>Вы превысили бюджет на ${-total}&#8381;</p>`;
+        const self = this;
+        setTimeout(function(){
+          self.balanceFeedback.classList.remove('showItem');
+        }, 3000);
+      } else {
+        this.itemID++;
+        this.itemList.push(expense);
+        this.addExpense(expense);
+        this.showBalance();
+      }
     }
   }
 
@@ -75,7 +97,8 @@ class UI {
     <h5 class="expense-amount mb-0 list-item">${expense.amount}&#8381;</h5>
 
     <div class="expense list-item">
-
+    <a href="#" class="duplicate" data-id="${expense.id}">
+      <i>дублировать</i>
      <a href="#" class="delete" data-id="${expense.id}">
       <i>удалить</i>
      </a>
@@ -110,6 +133,31 @@ class UI {
     this.itemList = tempList;
     this.showBalance();
   }
+  // дублировать расходы 
+  duplicateExpense(element){
+    let id = parseInt(element.dataset.id);
+    let exp = this.itemList.filter(function(item){
+      return item.id === id;
+    })
+    let expense = Object.assign({}, exp[0]);
+    expense.id = this.itemID;
+    
+    const expa = this.totalExpense() + expense.amount;
+    const total = parseInt(this.budgetAmount.textContent) - expa;
+    if(total < 0){
+      this.balanceFeedback.classList.add('showItem');
+      this.balanceFeedback.innerHTML = `<p>Вы превысили бюджет на ${-total}&#8381;</p>`;
+      const self = this;
+      setTimeout(function(){
+        self.balanceFeedback.classList.remove('showItem');
+      }, 3000);
+    } else {
+      this.itemID++;
+      this.addExpense(expense);
+      this.itemList.push(expense);
+      this.showBalance();
+    }
+  }
 }
 
 function eventListeners(){
@@ -131,9 +179,11 @@ function eventListeners(){
     ui.submitExpenseForm();
 
   })
-  // удаление
+  // дублирование и удаление
   expenseList.addEventListener('click', function(event){
-    if (event.target.parentElement.classList.contains('delete')){
+    if (event.target.parentElement.classList.contains('duplicate')){
+      ui.duplicateExpense(event.target.parentElement);
+    }else if (event.target.parentElement.classList.contains('delete')){
       ui.deleteExpense(event.target.parentElement);
     }
   })
