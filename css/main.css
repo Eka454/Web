@@ -1,6 +1,7 @@
 
 .budget-feedback,
-.expense-feedback {
+.expense-feedback,
+.balance-feedback {
   display: none;
 }
 
